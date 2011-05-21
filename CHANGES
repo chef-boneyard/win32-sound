@@ -1,3 +1,9 @@
+== 0.4.3 - 21-May-2011
+* Refactored Rakefile, removing an old gem install task and adding a
+  default task and a clean task.
+* Altered the gemspec, including a platform change to 'universal-win32', and
+  removed a deprecated specification method.
+
 == 0.4.2 - 6-Aug-2009
 * Changed the license to Artistic 2.0.
 * Updated to use the Windows::Sound module from the windows-pr library.
