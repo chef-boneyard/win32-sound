@@ -85,6 +85,18 @@ class TC_Win32_Sound < Test::Unit::TestCase
     assert_not_nil(Sound::SYNC)
   end
 
+  test "ffi functions are private" do
+    assert_not_respond_to(Sound, :Beep)
+    assert_not_respond_to(Sound, :waveOutSetVolume)
+    assert_not_respond_to(Sound, :waveOutGetVolume)
+    assert_not_respond_to(Sound, :waveOutGetNumDevs)
+    assert_not_respond_to(Sound, :waveInGetNumDevs)
+    assert_not_respond_to(Sound, :midiInGetNumDevs)
+    assert_not_respond_to(Sound, :midiOutGetNumDevs)
+    assert_not_respond_to(Sound, :auxGetNumDevs)
+    assert_not_respond_to(Sound, :mixerGetNumDevs)
+  end
+
   def teardown
     @wav = nil
   end

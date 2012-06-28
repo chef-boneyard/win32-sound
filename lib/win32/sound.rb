@@ -8,6 +8,8 @@ module Win32
   class Sound
     extend FFI::Library
 
+    private
+
     ffi_lib :kernel32
 
     attach_function :Beep, [:ulong, :ulong], :bool
@@ -23,6 +25,12 @@ module Win32
     attach_function :midiInGetNumDevs, [], :int
     attach_function :auxGetNumDevs, [], :int
     attach_function :mixerGetNumDevs, [], :int
+
+    private_class_method :Beep, :PlaySound, :waveOutSetVolume, :waveOutGetVolume
+    private_class_method :waveInGetNumDevs, :waveOutGetNumDevs, :midiOutGetNumDevs
+    private_class_method :midiInGetNumDevs, :auxGetNumDevs, :mixerGetNumDevs
+
+    public
 
     # The version of the win32-sound library
     VERSION = '0.5.0'
