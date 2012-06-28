@@ -1,63 +1,56 @@
-== Description
-   A library for playing and controlling sounds on MS Windows.
+= Description
+  A library for playing and controlling sounds on MS Windows.
 
-== Prerequisites
-   * windows-pr 1.0.6 or later
+= Prerequisites
+  * ffi
+  * test-unit 2 (Development only)
 
-== Installation instructions
-=== Gem installation
-   gem install win32-sound
+= Installation
+  gem install win32-sound
 
-=== Local installation
-   rake test (optional)
-   rake install (non-gem) or rake install_gem (gem)
+= Synopsis
+  require 'win32/sound'
+  include Win32
 
-== Synopsis
-   require 'win32/sound'
-   include Win32
+  # Play a wav file
+  Sound.play("somefile.wav")
 
-   # Play a wav file
-   Sound.play("somefile.wav")
+  # Play a system sound
+  Sound.play("SystemAsterisk",Sound::ALIAS)
 
-   # Play a system sound
-   Sound.play("SystemAsterisk",Sound::ALIAS)
+  # Get the current volume of the waveform-audio output device.
+  p Sound.volume.join(", ") # left channel, right channel
 
-   # Get the current volume of the waveform-audio output device.
-   p Sound.volume.join(", ") # left channel, right channel
+= Acknowledgements
+  API ideas derived (or not) from Perl's Win32::Sound module and Python's
+  winsound package.
 
-== Acknowledgements
-   API ideas derived (or not) from Perl's Win32::Sound module and Python's
-   winsound package.
-
-== Known Bugs
-   None that I'm aware of. Please report any bugs on the Win32 Utils home
-   page at http://rubyforge.org/projects/win32utils.
+= Known Bugs
+  None that I'm aware of. Please report any bugs on the project page
+  at https://github.com/djberg96/win32-sound.
    
-== Questions and Comments
-   Please post questions and/or comments on one of the forums on the project
-   page at http://rubyforge.org/projects/win32utils. Click the 'Forums' tab.
+= Future Plans
+  Add ability to retrieve information about WAV files.
+  Add MIDI support?
+
+= Developer's Notes
+  The MessageBeep() function, which the Python "winsound" module contains,
+  is intentionally omitted here. I felt it was redundant, because you can
+  achieve the same effect with something like this:
+
+    Sound.play("SystemAsterisk", Sound::ALIAS).
 	
-== Future Plans
-   Add ability to retrieve information about WAV files.
-   Add MIDI support?
+= License
+  Artistic 2.0
 
-== Developer's Notes
-   The MessageBeep() function, which the Python "winsound" module contains,
-   is intentionally omitted here. I felt it was redundant, because you can
-   achieve the same effect with something like this:
-   Sound.play("SystemAsterisk", Sound::ALIAS).
-	
-== License
-   Artistic 2.0
+= Copyright
+  (C) 2004-2012, Daniel J. Berger, All Rights Reserved
 
-== Copyright
-   (C) 2004-2009, Daniel J. Berger, All Rights Reserved
+= Warranty
+  This package is provided "as is" and without any express or
+  implied warranties, including, without limitation, the implied
+  warranties of merchantability and fitness for a particular purpose.
 
-== Warranty
-   This package is provided "as is" and without any express or
-   implied warranties, including, without limitation, the implied
-   warranties of merchantability and fitness for a particular purpose.
-
-== Author(s)
-   Daniel Berger
-   Park Heesob
+= Author(s)
+  Daniel Berger
+  Park Heesob

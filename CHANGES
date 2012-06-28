@@ -1,3 +1,9 @@
+== 0.5.0 - 28-Jun-2012
+* Now uses FFI instead of win32-api. This means it works with JRuby, too.
+* Corresponding updates to the tests, Rakefile, gemspec, etc.
+* Removed the Sound::Error exception class. If an underlying FFI function
+  fails then a SystemCallError (Errno::XXX) is raised instead.
+
 == 0.4.3 - 21-May-2011
 * Refactored Rakefile, removing an old gem install task and adding a
   default task and a clean task.
