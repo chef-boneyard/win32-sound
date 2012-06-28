@@ -4,7 +4,7 @@
 # Test suite for the win32-sound library. You should run this test case
 # via the 'rake test' task.
 ##########################################################################
-require 'test/unit'
+require 'test-unit'
 require 'win32/sound'
 include Win32
 
@@ -14,7 +14,7 @@ class TC_Win32_Sound < Test::Unit::TestCase
   end
 
   def test_version
-    assert_equal('0.4.3', Sound::VERSION)
+    assert_equal('0.5.0', Sound::VERSION)
   end
 
   def test_beep
@@ -23,7 +23,7 @@ class TC_Win32_Sound < Test::Unit::TestCase
   end
 
   def test_beep_expected_errors
-    assert_raises(Sound::Error){ Sound.beep(0, 100) }
+    assert_raises(ArgumentError){ Sound.beep(0, 100) }
     assert_raises(ArgumentError){ Sound.beep }
     assert_raises(ArgumentError){ Sound.beep(500) }
     assert_raises(ArgumentError){ Sound.beep(500, 500, 5) }
@@ -68,7 +68,7 @@ class TC_Win32_Sound < Test::Unit::TestCase
   end
 
   def test_expected_errors
-    assert_raises(Sound::Error){ Sound.beep(-1, 1) }
+    assert_raises(ArgumentError){ Sound.beep(-1, 1) }
   end
 
   def test_constants

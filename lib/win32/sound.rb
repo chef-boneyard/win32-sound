@@ -1,5 +1,4 @@
-require 'windows/sound'
-require 'windows/error'
+require 'ffi'
 
 # The Win32 module serves as a namespace only.
 module Win32
@@ -7,36 +6,44 @@ module Win32
   # The Sound class encapsulates various methods for playing sound as well
   # as querying or configuring sound related properties.
   class Sound
+    extend FFI::Library
 
-    # The Win32::Sound::Error class is typically raised if any of the
-    # Win32::Sound methods fail.
-    class Error < StandardError; end
+    ffi_lib :kernel32
 
-    include Windows::Sound
-    include Windows::Error
-    extend Windows::Sound
-    extend Windows::Error
+    attach_function :Beep, [:ulong, :ulong], :bool
+
+    ffi_lib :winmm
+
+    attach_function :PlaySound, [:string, :long, :ulong], :bool
+    attach_function :waveOutSetVolume, [:long, :ulong], :int
+    attach_function :waveOutGetVolume, [:long, :pointer], :int
+    attach_function :waveOutGetNumDevs, [], :int
+    attach_function :waveInGetNumDevs, [], :int
+    attach_function :midiOutGetNumDevs, [], :int
+    attach_function :midiInGetNumDevs, [], :int
+    attach_function :auxGetNumDevs, [], :int
+    attach_function :mixerGetNumDevs, [], :int
 
     # The version of the win32-sound library
-    VERSION = '0.4.3'
+    VERSION = '0.5.0'
 
     LOW_FREQUENCY  = 37
     HIGH_FREQUENCY = 32767
     MAX_VOLUME     = 0xFFFF
 
-    SYNC           = SND_SYNC        # play synchronously (default)
-    ASYNC          = SND_ASYNC       # play asynchronously
-    NODEFAULT      = SND_NODEFAULT   # silence (!default) if sound not found
-    MEMORY         = SND_MEMORY      # pszSound points to a memory file
-    LOOP           = SND_LOOP        # loop the sound until next sndPlaySound
-    NOSTOP         = SND_NOSTOP      # don't stop any currently playing sound
-    NOWAIT         = SND_NOWAIT      # don't wait if the driver is busy
-    ALIAS          = SND_ALIAS       # name is a registry alias
-    ALIAS_ID       = SND_ALIAS_ID    # alias is a predefined ID
-    FILENAME       = SND_FILENAME    # name is file name
-    RESOURCE       = SND_RESOURCE    # name is resource name or atom
-    PURGE          = SND_PURGE       # purge non-static events for task
-    APPLICATION    = SND_APPLICATION # look for app specific association
+    SYNC           = 0x00000000 # play synchronously (default)
+    ASYNC          = 0x00000001 # play asynchronously
+    NODEFAULT      = 0x00000002 # silence (!default) if sound not found
+    MEMORY         = 0x00000004 # pszSound points to a memory file
+    LOOP           = 0x00000008 # loop the sound until next sndPlaySound
+    NOSTOP         = 0x00000010 # don't stop any currently playing sound
+    NOWAIT         = 8192       # don't wait if the driver is busy
+    ALIAS          = 65536      # name is a registry alias
+    ALIAS_ID       = 1114112    # alias is a predefined ID
+    FILENAME       = 131072     # name is file name
+    RESOURCE       = 262148     # name is resource name or atom
+    PURGE          = 0x00000040 # purge non-static events for task
+    APPLICATION    = 0x00000080 # look for app specific association
 
     # Returns an array of all the available sound devices; their names contain
     # the type of the device and a zero-based ID number. Possible return values
@@ -53,7 +60,7 @@ module Win32
         0.upto(auxGetNumDevs()){ |i| devs << "AUX#{i}" }
         0.upto(mixerGetNumDevs()){ |i| devs << "MIXER#{i}" }
       rescue Exception
-        raise Error, get_last_error
+        raise SystemCallError, FFI.errno, "GetNumDevs"
       end
 
       devs
@@ -67,11 +74,11 @@ module Win32
     #
     def self.beep(frequency, duration)
       if frequency > HIGH_FREQUENCY || frequency < LOW_FREQUENCY
-        raise Error, 'invalid frequency'
+        raise ArgumentError, 'invalid frequency'
       end
 
       if 0 == Beep(frequency, duration)
-        raise Error, get_last_error
+        raise SystemCallError, FFI.errno, "Beep"
       end
 
       self
@@ -87,8 +94,8 @@ module Win32
         flags = 0
       end
 
-      unless PlaySound(0, 0, flags)
-        raise Error, get_last_error
+      unless PlaySound(nil, 0, flags)
+        raise SystemCallError, FFI.errno, "PlaySound"
       end
 
       self
@@ -156,7 +163,7 @@ module Win32
     #
     def self.play(sound, flags = 0)
       unless PlaySound(sound, 0, flags)
-        raise Error, get_last_error
+        raise SystemCallError, FFI.errno, "PlaySound"
       end
 
       self
@@ -177,7 +184,7 @@ module Win32
       volume = lvolume | rvolume << 16
 
       if waveOutSetVolume(-1, volume) != 0
-        raise Error, get_last_error
+        raise SystemCallError, FFI.errno, "waveOutSetVolume"
       end
 
       self
@@ -186,11 +193,14 @@ module Win32
     # Returns a 2-element array that contains the volume for the left channel
     # and right channel, respectively.
     def self.wave_volume
-      volume = [0].pack('L')
-      if waveOutGetVolume(-1, volume) != 0
-        raise Error, get_last_error
+      ptr = FFI::MemoryPointer.new(:ulong)
+
+      if waveOutGetVolume(-1, ptr) != 0
+        raise SystemCallError, FFI.errno, "waveOutGetVolume"
       end
-      volume = volume.unpack('L').first
+
+      volume = ptr.read_long
+
       [low_word(volume), high_word(volume)]
     end
 
