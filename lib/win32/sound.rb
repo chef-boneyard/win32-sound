@@ -10,15 +10,19 @@ module Win32
 
     private
 
+    typedef :ulong, :dword
+    typedef :uintptr_t, :hmodule
+    typedef :uintptr_t, :hwaveout
+
     ffi_lib :kernel32
 
-    attach_function :Beep, [:ulong, :ulong], :bool
+    attach_function :Beep, [:dword, :dword], :bool
 
     ffi_lib :winmm
 
-    attach_function :PlaySound, [:string, :long, :ulong], :bool
-    attach_function :waveOutSetVolume, [:long, :ulong], :int
-    attach_function :waveOutGetVolume, [:long, :pointer], :int
+    attach_function :PlaySound, [:string, :hmodule, :dword], :bool
+    attach_function :waveOutSetVolume, [:hwaveout, :dword], :int
+    attach_function :waveOutGetVolume, [:hwaveout, :pointer], :int
     attach_function :waveOutGetNumDevs, [], :int
     attach_function :waveInGetNumDevs, [], :int
     attach_function :midiOutGetNumDevs, [], :int
@@ -33,7 +37,7 @@ module Win32
     public
 
     # The version of the win32-sound library
-    VERSION = '0.5.0'
+    VERSION = '0.5.1'
 
     LOW_FREQUENCY  = 37
     HIGH_FREQUENCY = 32767
