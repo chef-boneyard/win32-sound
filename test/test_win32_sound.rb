@@ -14,7 +14,7 @@ class TC_Win32_Sound < Test::Unit::TestCase
   end
 
   def test_version
-    assert_equal('0.5.0', Sound::VERSION)
+    assert_equal('0.5.1', Sound::VERSION)
   end
 
   def test_beep
