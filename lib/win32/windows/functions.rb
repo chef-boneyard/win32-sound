@@ -13,6 +13,7 @@ module Windows
 
     private
 
+    # Make FFI functions private
     def self.attach_pfunc(*args)
       attach_function(*args)
       private args[0]
