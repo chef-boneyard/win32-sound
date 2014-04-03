@@ -13,9 +13,13 @@ module Win32
     # The version of the win32-sound library
     VERSION = '0.6.0'
 
+    private
+
     LOW_FREQUENCY  = 37
     HIGH_FREQUENCY = 32767
     MAX_VOLUME     = 0xFFFF
+
+    public
 
     SYNC           = 0x00000000 # play synchronously (default)
     ASYNC          = 0x00000001 # play asynchronously
