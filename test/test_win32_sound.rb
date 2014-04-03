@@ -13,7 +13,7 @@ class TC_Win32_Sound < Test::Unit::TestCase
     @wav = "c:\\windows\\media\\chimes.wav"
   end
 
-  def test_version
+  test "version constant is set to expected value" do
     assert_equal('0.6.0', Sound::VERSION)
   end
 
@@ -71,7 +71,7 @@ class TC_Win32_Sound < Test::Unit::TestCase
     assert_raises(ArgumentError){ Sound.beep(-1, 1) }
   end
 
-  def test_constants
+  test "expected constants are defined" do
     assert_not_nil(Sound::ALIAS)
     assert_not_nil(Sound::APPLICATION)
     assert_not_nil(Sound::ASYNC)
@@ -95,6 +95,11 @@ class TC_Win32_Sound < Test::Unit::TestCase
     assert_not_respond_to(Sound, :midiOutGetNumDevs)
     assert_not_respond_to(Sound, :auxGetNumDevs)
     assert_not_respond_to(Sound, :mixerGetNumDevs)
+    assert_not_respond_to(Sound, :waveOutOpen)
+    assert_not_respond_to(Sound, :waveOutPrepareHeader)
+    assert_not_respond_to(Sound, :waveOutWrite)
+    assert_not_respond_to(Sound, :waveOutUnprepareHeader)
+    assert_not_respond_to(Sound, :waveOutClose)
   end
 
   def teardown
