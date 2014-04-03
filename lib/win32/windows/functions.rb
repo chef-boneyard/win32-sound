@@ -8,6 +8,7 @@ module Windows
     typedef :ulong, :dword
     typedef :uintptr_t, :hmodule
     typedef :uintptr_t, :hwaveout
+    typedef :uint, :mmresult
 
     ffi_lib :kernel32
 
@@ -31,5 +32,10 @@ module Windows
     attach_pfunc :midiInGetNumDevs, [], :int
     attach_pfunc :auxGetNumDevs, [], :int
     attach_pfunc :mixerGetNumDevs, [], :int
+    attach_pfunc :waveOutOpen, [:pointer, :uint, :pointer, :dword, :dword, :dword], :mmresult
+    attach_pfunc :waveOutPrepareHeader, [:hwaveout, :pointer, :uint], :mmresult
+    attach_pfunc :waveOutWrite, [:hwaveout, :pointer, :uint], :mmresult
+    attach_pfunc :waveOutUnprepareHeader, [:hwaveout, :pointer, :uint], :mmresult
+    attach_pfunc :waveOutClose, [:hwaveout], :mmresult
   end
 end
