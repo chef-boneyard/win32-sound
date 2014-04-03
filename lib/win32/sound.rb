@@ -1,4 +1,4 @@
-require 'ffi'
+require_relative 'windows/functions'
 
 # The Win32 module serves as a namespace only.
 module Win32
@@ -6,38 +6,14 @@ module Win32
   # The Sound class encapsulates various methods for playing sound as well
   # as querying or configuring sound related properties.
   class Sound
-    extend FFI::Library
-
-    private
-
-    typedef :ulong, :dword
-    typedef :uintptr_t, :hmodule
-    typedef :uintptr_t, :hwaveout
-
-    ffi_lib :kernel32
-
-    attach_function :Beep, [:dword, :dword], :bool
-
-    ffi_lib :winmm
-
-    attach_function :PlaySound, [:string, :hmodule, :dword], :bool
-    attach_function :waveOutSetVolume, [:hwaveout, :dword], :int
-    attach_function :waveOutGetVolume, [:hwaveout, :pointer], :int
-    attach_function :waveOutGetNumDevs, [], :int
-    attach_function :waveInGetNumDevs, [], :int
-    attach_function :midiOutGetNumDevs, [], :int
-    attach_function :midiInGetNumDevs, [], :int
-    attach_function :auxGetNumDevs, [], :int
-    attach_function :mixerGetNumDevs, [], :int
-
-    private_class_method :Beep, :PlaySound, :waveOutSetVolume, :waveOutGetVolume
-    private_class_method :waveInGetNumDevs, :waveOutGetNumDevs, :midiOutGetNumDevs
-    private_class_method :midiInGetNumDevs, :auxGetNumDevs, :mixerGetNumDevs
+    include Windows::SoundStructs
+    include Windows::SoundFunctions
+    extend Windows::SoundFunctions
 
     public
 
     # The version of the win32-sound library
-    VERSION = '0.5.1'
+    VERSION = '0.6.0'
 
     LOW_FREQUENCY  = 37
     HIGH_FREQUENCY = 32767
