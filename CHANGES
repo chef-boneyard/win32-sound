@@ -1,3 +1,9 @@
+== 0.6.0 - ???
+* Added the play_freq method. This lets you play a frequency for a
+  specified duration at a given volume. Big thanks go out to Dominic
+  Muller for the patch.
+* Reorganization of FFI related code into their own files.
+
 == 0.5.1 - 10-Apr-2013
 * Updated HANDLE prototype in underlying FFI code. This affects
   64 bit versions of Ruby.
