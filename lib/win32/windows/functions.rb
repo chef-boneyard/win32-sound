@@ -1,5 +1,4 @@
 require 'ffi'
-require_relative 'structs'
 
 module Windows
   module SoundFunctions
