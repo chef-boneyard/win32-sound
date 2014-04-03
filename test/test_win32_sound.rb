@@ -71,6 +71,21 @@ class TC_Win32_Sound < Test::Unit::TestCase
     assert_raises(ArgumentError){ Sound.beep(-1, 1) }
   end
 
+  test "play_freq basic functionality" do
+    assert_respond_to(Sound, :play_freq)
+    assert_nothing_raised{ Sound.play_freq(660.0, 500) }
+  end
+
+  test "play_freq raises an error if the frequency is too high or too low" do
+    assert_raise(ArgumentError){ Sound.play_freq(999999999, 500) }
+    assert_raise(ArgumentError){ Sound.play_freq(1, 500) }
+  end
+
+  test "play_freq raises an error if the duration is too high or too low" do
+    assert_raise(ArgumentError){ Sound.play_freq(660.0, 9999999) }
+    assert_raise(ArgumentError){ Sound.play_freq(660.0, -1) }
+  end
+
   test "expected constants are defined" do
     assert_not_nil(Sound::ALIAS)
     assert_not_nil(Sound::APPLICATION)
