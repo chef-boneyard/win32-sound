@@ -45,4 +45,12 @@ Sound.play("Foofoo", Sound::ALIAS)
 
 puts "Playing a beep"
 sleep 1
-Sound.beep(500, 10000)
+Sound.beep(500, 2000)
+
+puts "Playing multiple frequencies simultaneously"
+sleep 1
+threads = []
+[440, 660].each do |freq|
+  threads << Thread.new { Sound.play_freq(freq) }
+end
+threads.each { |th| th.join }
