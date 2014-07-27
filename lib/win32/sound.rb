@@ -52,7 +52,11 @@ module Win32
     # thread for 660 finished calculating its PCM array and they
     # will both start streaming at the same time.
     #
-    def self.play_freq(frequency = 440, duration = 1000, volume = 1)
+    # If pause_execution is set to true, the thread will calculate
+    # all pending PCM arrays and wait to be woken up again.  This
+    # if useful for time-sensitive playback of notes in succession.
+    #
+    def self.play_freq(frequency = 440, duration = 1000, volume = 1, pause_execution = false)
 
       if frequency > HIGH_FREQUENCY || frequency < LOW_FREQUENCY
         raise ArgumentError, 'invalid frequency'
@@ -62,18 +66,14 @@ module Win32
         raise ArgumentError, 'invalid duration'
       end
 
-      stream { |wfx|
+      stream(pause_execution) do |wfx|
         data = generate_pcm_integer_array_for_freq(frequency, duration, volume)
         data_buffer = FFI::MemoryPointer.new(:int, data.size)
         data_buffer.write_array_of_int data
         buffer_length = wfx[:nAvgBytesPerSec]*duration/1000
-        hdr = WAVEHDR.new
-        hdr[:lpData] = data_buffer
-        hdr[:dwBufferLength] = buffer_length
-        hdr[:dwFlags] = 0
-        hdr[:dwLoops] = 1
-        hdr
-      }
+        WAVEHDR.new(data_buffer, buffer_length)
+      end
+        
     end
 
     # Returns an array of all the available sound devices; their names contain
@@ -270,7 +270,7 @@ module Win32
     # functions and structs to set up a double buffer to incrementally
     # push PCM data to.
     #
-    def self.stream
+    def self.stream(pause_execution)
       hWaveOut = HWAVEOUT.new
       wfx = WAVEFORMATEX.new
 
@@ -292,6 +292,11 @@ module Win32
         raise SystemCallError.new('waveOutPrepareHeader', FFI.errno)
       end
 
+      if pause_execution
+        Thread.stop
+        Thread.current[:sleep_time] ||= 0
+        sleep Thread.current[:sleep_time]
+      end
       Thread.pass
 
       if (waveOutWrite(hWaveOut[:i], header.pointer, header.size) != 0)
