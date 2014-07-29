@@ -15,25 +15,29 @@ module Win32
 
     private
 
-    LOW_FREQUENCY  = 37
-    HIGH_FREQUENCY = 32767
-    MAX_VOLUME     = 0xFFFF
+    LOW_FREQUENCY   = 37
+    HIGH_FREQUENCY  = 32767
+    MAX_VOLUME      = 0xFFFF
+    WAVE_FORMAT_PCM = 1     # Waveform-audio data is PCM.
+    WAVE_MAPPER     = -1    # Used by waveOutOpen.  The function selects
+                            # a waveform-audio output device capable of
+                            # playing the given format.
 
     public
 
-    SYNC           = 0x00000000 # play synchronously (default)
-    ASYNC          = 0x00000001 # play asynchronously
-    NODEFAULT      = 0x00000002 # silence (!default) if sound not found
-    MEMORY         = 0x00000004 # pszSound points to a memory file
-    LOOP           = 0x00000008 # loop the sound until next sndPlaySound
-    NOSTOP         = 0x00000010 # don't stop any currently playing sound
-    NOWAIT         = 8192       # don't wait if the driver is busy
-    ALIAS          = 65536      # name is a registry alias
-    ALIAS_ID       = 1114112    # alias is a predefined ID
-    FILENAME       = 131072     # name is file name
-    RESOURCE       = 262148     # name is resource name or atom
-    PURGE          = 0x00000040 # purge non-static events for task
-    APPLICATION    = 0x00000080 # look for app specific association
+    SYNC            = 0x00000000 # play synchronously (default)
+    ASYNC           = 0x00000001 # play asynchronously
+    NODEFAULT       = 0x00000002 # silence (!default) if sound not found
+    MEMORY          = 0x00000004 # pszSound points to a memory file
+    LOOP            = 0x00000008 # loop the sound until next sndPlaySound
+    NOSTOP          = 0x00000010 # don't stop any currently playing sound
+    NOWAIT          = 8192       # don't wait if the driver is busy
+    ALIAS           = 65536      # name is a registry alias
+    ALIAS_ID        = 1114112    # alias is a predefined ID
+    FILENAME        = 131072     # name is file name
+    RESOURCE        = 262148     # name is resource name or atom
+    PURGE           = 0x00000040 # purge non-static events for task
+    APPLICATION     = 0x00000080 # look for app specific association
 
     # Plays a frequency for a specified duration at a given volume.
     # Defaults are 440Hz, 1 second, full volume.
@@ -52,11 +56,11 @@ module Win32
     # thread for 660 finished calculating its PCM array and they
     # will both start streaming at the same time.
     #
-    # If pause_execution is set to true, the thread will calculate
+    # If immediate_playback is set to false, the thread will calculate
     # all pending PCM arrays and wait to be woken up again.  This
     # if useful for time-sensitive playback of notes in succession.
     #
-    def self.play_freq(frequency = 440, duration = 1000, volume = 1, pause_execution = false)
+    def self.play_freq(frequency = 440, duration = 1000, volume = 1, immediate_playback = true)
 
       if frequency > HIGH_FREQUENCY || frequency < LOW_FREQUENCY
         raise ArgumentError, 'invalid frequency'
@@ -66,14 +70,18 @@ module Win32
         raise ArgumentError, 'invalid duration'
       end
 
-      stream(pause_execution) do |wfx|
+      if volume.abs > 1
+        warn("WARNING: Volume greater than 1 will cause audio clipping.")
+      end
+
+      stream(immediate_playback) do |wfx|
         data = generate_pcm_integer_array_for_freq(frequency, duration, volume)
         data_buffer = FFI::MemoryPointer.new(:int, data.size)
         data_buffer.write_array_of_int data
         buffer_length = wfx[:nAvgBytesPerSec]*duration/1000
         WAVEHDR.new(data_buffer, buffer_length)
       end
-        
+
     end
 
     # Returns an array of all the available sound devices; their names contain
@@ -242,9 +250,6 @@ module Win32
 
     private
 
-    WAVE_FORMAT_PCM = 1
-    WAVE_MAPPER = -1
-
     def self.low_word(num)
       num & 0xFFFF
     end
@@ -270,7 +275,7 @@ module Win32
     # functions and structs to set up a double buffer to incrementally
     # push PCM data to.
     #
-    def self.stream(pause_execution)
+    def self.stream(immediate_playback)
       hWaveOut = HWAVEOUT.new
       wfx = WAVEFORMATEX.new
 
@@ -292,7 +297,7 @@ module Win32
         raise SystemCallError.new('waveOutPrepareHeader', FFI.errno)
       end
 
-      if pause_execution
+      unless immediate_playback
         Thread.stop
         Thread.current[:sleep_time] ||= 0
         sleep Thread.current[:sleep_time]

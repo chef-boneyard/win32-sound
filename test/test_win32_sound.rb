@@ -5,6 +5,7 @@
 # via the 'rake test' task.
 ##########################################################################
 require 'test-unit'
+require 'stringio'
 require 'win32/sound'
 include Win32
 
@@ -86,6 +87,16 @@ class TC_Win32_Sound < Test::Unit::TestCase
     assert_raise(ArgumentError){ Sound.play_freq(660.0, -1) }
   end
 
+  test "play_freq displays a warning if volume is too large" do
+    @orig_stderr = $stderr
+    $stderr = StringIO.new
+    Sound.play_freq(440, 200, 2)
+    $stderr.rewind
+    assert_equal("WARNING: Volume greater than 1 will cause audio clipping.",
+      $stderr.string.chomp)
+    $stderr = @orig_stderr
+  end
+
   test "expected constants are defined" do
     assert_not_nil(Sound::ALIAS)
     assert_not_nil(Sound::APPLICATION)
@@ -98,10 +109,17 @@ class TC_Win32_Sound < Test::Unit::TestCase
     assert_not_nil(Sound::NOWAIT)
     assert_not_nil(Sound::PURGE)
     assert_not_nil(Sound::SYNC)
+    assert_not_nil(Sound::VERSION)
+    assert_not_nil(Sound::WAVE_FORMAT_PCM)
+    assert_not_nil(Sound::WAVE_MAPPER)
+    assert_not_nil(Sound::HWAVEOUT)
+    assert_not_nil(Sound::WAVEFORMATEX)
+    assert_not_nil(Sound::WAVEHDR)
   end
 
   test "ffi functions are private" do
     assert_not_respond_to(Sound, :Beep)
+    assert_not_respond_to(Sound, :PlaySound)
     assert_not_respond_to(Sound, :waveOutSetVolume)
     assert_not_respond_to(Sound, :waveOutGetVolume)
     assert_not_respond_to(Sound, :waveOutGetNumDevs)

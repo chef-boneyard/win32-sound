@@ -4,8 +4,6 @@ module Windows
   module SoundStructs
     extend FFI::Library
     
-    WAVE_FORMAT_PCM = 1
-    
     # Define an HWAVEOUT struct for use by all the waveOut functions.
     # It is a handle to a waveOut stream, so starting up multiple
     # streams using different handles allows for simultaneous playback.
@@ -27,7 +25,7 @@ module Windows
       # set struct will result in unpredictable behavior.
       #
       def initialize(nSamplesPerSec = 44100, wBitsPerSample = 16, nChannels = 1, cbSize = 0)
-        self[:wFormatTag] = WAVE_FORMAT_PCM
+        self[:wFormatTag] = Win32::Sound::WAVE_FORMAT_PCM
         self[:nChannels] = nChannels
         self[:nSamplesPerSec] = nSamplesPerSec
         self[:wBitsPerSample] = wBitsPerSample
