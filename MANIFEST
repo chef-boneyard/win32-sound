@@ -5,4 +5,6 @@
 * win32-sound.gempsec
 * examples/sound_test.rb
 * lib/win32/sound.rb
-* test/tc_sound.rb
+* lib/win32/windows/functions.rb
+* lib/win32/windows/structs.rb
+* test/test_win32_sound.rb
