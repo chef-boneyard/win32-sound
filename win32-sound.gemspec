@@ -2,7 +2,7 @@ require 'rubygems'
 
 Gem::Specification.new do |spec|
   spec.name      = 'win32-sound'
-  spec.version   = '0.5.1'
+  spec.version   = '0.6.0'
   spec.author    = 'Daniel J. Berger'
   spec.license   = 'Artistic 2.0'
   spec.email     = 'djberg96@gmail.com'
@@ -12,10 +12,10 @@ Gem::Specification.new do |spec|
   spec.files     = Dir['**/*'] << ".gemtest"
 
   spec.extra_rdoc_files  = ['CHANGES', 'README', 'MANIFEST']
-  spec.rubyforge_project = 'win32utils'
 
   spec.add_dependency('ffi')
   spec.add_development_dependency('test-unit')
+  spec.add_development_dependency('rake')
 
   spec.description = <<-EOF
     The win32-sound library provides an interface for playing various
