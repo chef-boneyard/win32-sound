@@ -1,3 +1,6 @@
+== 0.6.2 - 19-Mar-2017
+* Added a win32-sound.rb file for convenience.
+
 == 0.6.1 - 19-Mar-2017
 * Added a cert file.
 * Removed the .gemtest file.
