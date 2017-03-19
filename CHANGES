@@ -1,3 +1,8 @@
+== 0.6.1 - 19-Mar-2017
+* Added a cert file.
+* Removed the .gemtest file.
+* All gem related rake tasks now assume Rubygems 2.0 or later.
+
 == 0.6.0 - 30-Jul-2014
 * Added the play_freq method. This lets you play a frequency for a
   specified duration at a given volume. Big thanks go out to Dominic
