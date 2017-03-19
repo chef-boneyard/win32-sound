@@ -15,7 +15,7 @@ class TC_Win32_Sound < Test::Unit::TestCase
   end
 
   test "version constant is set to expected value" do
-    assert_equal('0.6.0', Sound::VERSION)
+    assert_equal('0.6.1', Sound::VERSION)
   end
 
   def test_beep
